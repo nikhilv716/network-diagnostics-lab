@@ -1,6 +1,6 @@
 # Milestone 1 | AI-Powered Network Diagnostics and IT Risk Assessment Agent
 
-Open `Milestone_1_Progress.pdf` for the submission write-up. The initial Skill is in `.agents/skills/diagnose-order-entry/SKILL.md`. Enable hidden files in your file browser if needed. The screenshots show the saved outputs from the recorded run. The corresponding plain-text logs and Codex's assessment are in `evidence/`.
+Open `Milestone_1_Progress.pdf` for the submission write-up. The initial Skill is in `.agents/skills/diagnose-order-entry/SKILL.md`. The screenshots show the saved outputs from the recorded run. The corresponding plain-text logs and Codex's assessment are in `evidence/`.
 
 ## Reproduce the workflow on Linux
 
