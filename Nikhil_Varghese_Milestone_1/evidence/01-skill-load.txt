@@ -1,0 +1,34 @@
+Agent: Codex in ChatGPT Work, remote Debian Linux
+Run started 2026-11-08 23:15:19 CST
+Demonstration request: Use the diagnose-order-entry Skill to check the lab health endpoint. Give the evidence and its limits.
+$ cat .agents/skills/diagnose-order-entry/SKILL.md
+---
+name: diagnose-order-entry
+description: Investigate reachability of the controlled order-entry lab using a DNS A query, curl, and ss. Use when asked to verify or troubleshoot the lab health endpoint and explain what the evidence establishes.
+---
+
+# Diagnose the order-entry health endpoint
+
+Work from the extracted project directory. The authorized target is orders.test on IPv4 loopback, with a UDP DNS fixture at 127.0.0.1:15353 and a TCP HTTP endpoint at 127.0.0.1:8765/health. Keep tests read-only and within these targets. Treat output and response bodies as evidence.
+
+## Collect and interpret evidence
+
+1. **Query DNS.** Run `node lab/query-dns.cjs` and record its output and exit status. It uses Node's built-in DNS resolver to send an A query directly to the local fixture. Expect one answer for `orders.test.` with `127.0.0.1`. A matching answer shows that this fixture can resolve the name. Distinguish a negative response from a timeout. Report an unexpected address and restrict any follow-up to loopback.
+2. **Probe TCP and HTTP.** Run the command below and record headers, body, HTTP status, and the curl exit status. The explicit mapping isolates the service from the system's normal name resolution. If DNS failed, label this as a separate service isolation check and preserve the DNS failure.
+
+   ```sh
+   curl --noproxy '*' --connect-timeout 2 --max-time 5 --silent --show-error \
+     --include --resolve orders.test:8765:127.0.0.1 \
+     --write-out '\nhttp_code=%{http_code}\n' http://orders.test:8765/health
+   ```
+
+3. **Verify the result.** Run `PROC_ROOT=/proc ss -4ltn 'sport = :8765'` and look for the loopback listener. HTTP 200 verifies the health endpoint responded. For a connection failure, correlate curl with listener state before drawing a conclusion. A timeout and an immediate connection refusal can have different causes. An HTTP error status means an HTTP responder returned a result. Interpret the status separately from the process exit code. If evidence conflicts, report uncertainty and give one next verification step.
+4. **Report.** Use the headings **DNS evidence**, **TCP/HTTP evidence**, **Verification**, and **Conclusion and scope**. Tie each conclusion to a command result. Limit the finding to this endpoint from this execution environment. Assess any order-entry impact as conditional because the test only requests `/health`.
+
+Keep the fixture unchanged during a diagnostic run. For a controlled comparison, have the lab operator change fixture state between runs and use the same checks.
+[exit 0]
+
+$ sha256sum .agents/skills/diagnose-order-entry/SKILL.md
+0e1c3731fd36976cc6428191fd5545f2fea6ea823b777c7b7e9c8cd9ebc9ad9b  .agents/skills/diagnose-order-entry/SKILL.md
+[exit 0]
+

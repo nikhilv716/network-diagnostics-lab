@@ -1,0 +1,24 @@
+RUN A / HEALTHY BASELINE
+2026-11-08 23:15:19 CST
+$ node lab/query-dns.cjs
+DNS server 127.0.0.1:15353 | query orders.test. IN A
+orders.test. 30 IN A 127.0.0.1
+[exit 0]
+
+$ curl --noproxy \* --connect-timeout 2 --max-time 5 --silent --show-error --include --resolve orders.test:8765:127.0.0.1 --write-out \\nhttp_code=%\{http_code\}\\n http://orders.test:8765/health
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.12.14
+Date: Mon, 09 Nov 2026 05:15:19 GMT
+Content-Type: application/json
+Content-Length: 40
+
+{"status":"ok","service":"order-entry"}
+
+http_code=200
+[exit 0]
+
+$ env PROC_ROOT=/proc ss -4ltn sport\ =\ :8765
+State  Recv-Q Send-Q Local Address:Port Peer Address:Port
+LISTEN 0      0          127.0.0.1:8765      0.0.0.0:*   
+[exit 0]
+

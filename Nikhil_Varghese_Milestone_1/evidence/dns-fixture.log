@@ -1,0 +1,4 @@
+READY dns 127.0.0.1:15353
+DNS orders.test type=1 rcode=0 answer=127.0.0.1
+DNS orders.test type=1 rcode=0 answer=127.0.0.1
+DNS orders.test type=1 rcode=0 answer=127.0.0.1
